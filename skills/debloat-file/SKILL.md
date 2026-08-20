@@ -1,6 +1,6 @@
 ---
 name: debloat-file
-description: Analyses a single CLAUDE.md, SKILL.md, or .claude/rules/*.md file for token-budget problems: unnecessary length, content that could be tiered to load conditionally instead of always-on, emphasis overuse, and missing progressive disclosure. Use when the user points at one specific file and asks whether it is bloated, too long, or well-tiered. Not for grading documentation completeness or quality, use claude-md-improver for that.
+description: "Analyses a single CLAUDE.md, SKILL.md, or .claude/rules/*.md file for token-budget problems: unnecessary length, content that could be tiered to load conditionally instead of always-on, emphasis overuse, and missing progressive disclosure. Use when the user points at one specific file and asks whether it is bloated, too long, or well-tiered. Not for grading documentation completeness or quality, use claude-md-improver for that."
 tools: Read, Grep, Glob, Bash
 ---
 

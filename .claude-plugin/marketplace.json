@@ -1,0 +1,15 @@
+{
+  "name": "claude-de-bloater-marketplace",
+  "owner": {
+    "name": "Alan Napieralski"
+  },
+  "metadata": {
+    "description": "Local marketplace serving the claude-de-bloater plugin"
+  },
+  "plugins": [
+    {
+      "name": "claude-de-bloater",
+      "source": "./"
+    }
+  ]
+}
