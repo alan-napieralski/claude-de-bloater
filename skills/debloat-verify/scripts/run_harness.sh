@@ -13,6 +13,7 @@ MATRIX="one-shot,brief,workflow"
 REPEATS_WORKFLOW=3
 MODE="context-only"
 OUT="/dev/stdout"
+CANARY_DIR=""
 
 usage() {
   cat >&2 <<'EOF'
@@ -23,12 +24,19 @@ Options:
                               are what gets measured, the operator's personal global config
                               is excluded via --setting-sources project.
   --config <label>           A label for this run, e.g. "baseline" or "candidate" (default: config)
-  --matrix <cells>           Comma-separated: one-shot,brief,workflow (default: all three)
+  --matrix <cells>           Comma-separated cell names, each read from
+                              <canary-dir>/<cell>.txt (default: one-shot,brief,workflow).
+                              gen_manual_context_invoke.py prints "manual-context-invoke" to add
+                              here once its prompt exists on disk.
   --repeats-workflow <n>     Repeats for the workflow cell only (default: 3). One-shot and
                               brief always run once, a fixed prompt against a fixed config
                               gives a deterministic size reading, repeats only matter where
                               the model's actual behaviour can vary run to run.
   --mode <mode>               context-only | real-turn | both (default: context-only)
+  --canary-dir <path>         Directory to read cell prompts from (default: this script's own
+                              canary_prompts/). Point this at gen_manual_context_invoke.py's
+                              output directory to run generated cells alongside or instead of the
+                              bundled ones.
   --out <path>                Where to write the JSON report (default: stdout)
 EOF
 }
@@ -40,11 +48,16 @@ while [[ $# -gt 0 ]]; do
     --matrix) MATRIX="$2"; shift 2 ;;
     --repeats-workflow) REPEATS_WORKFLOW="$2"; shift 2 ;;
     --mode) MODE="$2"; shift 2 ;;
+    --canary-dir) CANARY_DIR="$2"; shift 2 ;;
     --out) OUT="$2"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage; exit 1 ;;
   esac
 done
+
+if [[ -z "$CANARY_DIR" ]]; then
+  CANARY_DIR="$SCRIPT_DIR/canary_prompts"
+fi
 
 if [[ -z "$TARGET" ]]; then
   echo "Error: --target is required" >&2
@@ -94,7 +107,14 @@ fi
 
 if [[ "$MODE" == "real-turn" || "$MODE" == "both" ]]; then
   for cell in "${CELLS[@]}"; do
-    prompt_file="$SCRIPT_DIR/canary_prompts/${cell}.txt"
+    prompt_file="$CANARY_DIR/${cell}.txt"
+    if [[ ! -f "$prompt_file" && "$CANARY_DIR" != "$SCRIPT_DIR/canary_prompts" ]]; then
+      # Fall back to the bundled prompts so a generated --canary-dir (e.g.
+      # gen_manual_context_invoke.py's output, which only contains manual-context-invoke.txt) can
+      # still be combined with the default one-shot/brief/workflow cells without copying those
+      # files alongside it.
+      prompt_file="$SCRIPT_DIR/canary_prompts/${cell}.txt"
+    fi
     if [[ ! -f "$prompt_file" ]]; then
       echo "Warning: no canary prompt for cell '$cell', skipping" >&2
       continue
