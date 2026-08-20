@@ -11,6 +11,47 @@ Every serious tool in this space converges on the same idea: split what's always
 - **Structure and reference-tiering beat prose-cutting.** The biggest measured wins come from moving unconditional `@`-imports into path-scoped rules, not from trimming sentences.
 - **Every claim gets checked against a real number, not asserted.** Suggestions are validated with measured before/after token counts, not just theory.
 
+## The standard structure this tool checks against
+
+There's no single mandated layout, but the checks in `debloat-scan`/`debloat-file` all point at the same shape. This is what a project that would score cleanly looks like:
+
+```
+my-project/
+├── CLAUDE.md                     # short, project-wide only; content Claude can't infer from the code
+├── .claude/
+│   ├── rules/
+│   │   └── frontend-styles.md    # paths: ["src/styles/**"] frontmatter, loads only when touched
+│   ├── agents/
+│   │   ├── deployer.md
+│   │   └── deployer/
+│   │       └── references/
+│   │           └── rollout-steps.md   # this agent's own detail, colocated next to it
+│   ├── commands/
+│   │   └── release.md
+│   └── skills/
+│       └── changelog-writer/
+│           ├── SKILL.md          # short body; detail pushed out, not inlined
+│           ├── references/
+│           │   └── format-guide.md
+│           └── scripts/
+│               └── generate.py
+├── references/
+│   └── conventions.md            # general "good to know" material, not owned by any one item above
+├── docs/
+│   └── architecture.md           # genuine human-facing documentation, untouched by Claude Code
+└── src/
+    └── ...
+```
+
+A few things this layout deliberately gets right:
+
+- **`CLAUDE.md` stays lean and does its own `@`-importing sparingly.** Only content genuinely needed on every task lives here or in an unconditional import; anything domain-specific moves to a rule instead.
+- **`.claude/rules/*.md` carry a narrow `paths:` glob**, never `["**/*"]` or `["*"]`, so they load only when relevant rather than acting as a second always-loaded CLAUDE.md.
+- **An agent's own long reference material sits beside it** as `<name>/references/*.md`, not in a shared folder, so ownership stays unambiguous.
+- **A `SKILL.md` body stays short**, with real detail pushed into its own `references/*.md` (loaded progressively) and `scripts/*`, matching Claude Code's own skill format.
+- **A root-level `references/*.md` folder holds only material no single rule, agent, skill, or command owns.** Anything narrower belongs colocated instead.
+- **`docs/` or `notes/` are left alone when they're genuinely human-facing.** A generic folder name isn't a problem by itself; it's only worth a flag if what's actually inside is Claude-facing instruction material wearing a docs folder as a disguise.
+
 ## Before you start
 
 **`debloat-scan` and `debloat-file` need nothing.** They read files directly and estimate token cost from word count, no auth, no setup, no dependency on the point below.

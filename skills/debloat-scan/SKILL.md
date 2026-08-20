@@ -10,9 +10,13 @@ Audits a project's entire Claude Code context surface for token-budget problems.
 
 Advisory only. Read-only, never edit anything, hand findings back for the user to act on.
 
+## Scope
+
+Analyse the target project directory only. A session here also loads the user's global `~/.claude/CLAUDE.md` and whatever it `@`-imports (e.g. a personal best-practices file, or another project's rules pulled in unconditionally) — none of that belongs to this project, so it must not appear anywhere in the output: not in the token headline, not as a finding, not as a caveat or aside. If the project's own `CLAUDE.md` genuinely duplicates something from global config, judge the project file on its own merits and say nothing about the global side — that file is not this scan's to fix, and mentioning it miscasts a global-config decision as a project bloat problem. Only surface global config at all if the user directly asks about it.
+
 ## Procedure
 
-1. **Enumerate the surface.** Find the project's `CLAUDE.md` (and any nested `CLAUDE.md`/`CLAUDE.local.md`), walk its `@`-import graph fully (following imports up to the depth Claude Code itself resolves), and find `.claude/rules/*.md`, `.claude/commands/*.md`, `.claude/agents/*.md`, `.claude/hooks/`, `.claude/settings.json`, and `.claude/skills/*/SKILL.md`.
+1. **Enumerate the surface.** Find the project's `CLAUDE.md` (and any nested `CLAUDE.md`/`CLAUDE.local.md`), walk its `@`-import graph fully (following imports up to the depth Claude Code itself resolves), and find `.claude/rules/*.md`, `.claude/commands/*.md`, `.claude/agents/*.md`, `.claude/hooks/`, `.claude/settings.json`, and `.claude/skills/*/SKILL.md`. Stay inside the project directory per the Scope note above — do not walk an `@`-import that leads outside it.
 2. **Read every file found.** This is the step `debloat-file` can't do on a single file, cross-file checks depend on having all of it in view at once.
 3. Apply [the full checklist](references/checks.md), every check, including the ones `debloat-file` has to skip: duplication across files, circular imports, and whether a rules-file glob is actually selective in practice given the project's real file layout.
 4. Estimate each file's token cost (`words * 1.3`, rounded) and sum for the headline.

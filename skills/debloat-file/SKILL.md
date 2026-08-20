@@ -10,6 +10,10 @@ Reviews one file's token budget. For a whole project's surface (CLAUDE.md plus i
 
 Advisory only. Read-only, never edit the file, hand findings back for the user to act on.
 
+## Scope
+
+Judge the target file on its own content. Even if it substantively duplicates something in the user's global `~/.claude/CLAUDE.md` or another file outside the project, don't pull that file in or mention it — it's not part of this project's surface, and it isn't this skill's call to fix. Note the duplication only if the user directly asks whether it exists elsewhere.
+
 ## Procedure
 
 1. Read the target file in full.
