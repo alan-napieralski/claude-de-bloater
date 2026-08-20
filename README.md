@@ -95,6 +95,7 @@ If you're testing the plugin against a fixture or project that sits inside this 
 - **`bloated-sample`**: seven independent bloat patterns, ground truth in `EXPECTED_FINDINGS.md`.
 - **`severe-bloat`**: the worst case, every pattern from `bloated-sample` intensified, plus a circular `@`-import (not present in `bloated-sample`). Ground truth in `EXPECTED_FINDINGS.md`.
 - **`lean-baseline`**: the best case, a small, already-disciplined project with nothing to flag. Exists to catch false positives, if a skill invents a problem here, that is a bug.
+- **`self-citing-duplication`**: one isolated pattern, an agent that names another file as its authoritative spec and then restates that file's procedure and reporting format anyway, paraphrased so no sentence matches identically. Exists to catch under-running the "Redundant or duplicated" check: this pattern is invisible to a plain string diff and was missed on a first real-world scan before the check's method was tightened.
 - **`one-shot-small-app`**: a genuinely tiny, complete app (a single-page tip calculator), used to give the one-shot/brief canary prompts something realistic to measure against.
 - **`multi-workflow-app`**: a small static blog with a skill, an agent, and a command chained across a real three-step workflow (draft, review, publish), used to give the workflow canary prompt something realistic and multi-step to act on.
 

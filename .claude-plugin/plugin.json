@@ -1,7 +1,7 @@
 {
   "name": "claude-de-bloater",
   "description": "Analyses a project's Claude Code context surface (CLAUDE.md, rules, commands, agents, hooks, skills) for token-budget problems and measures the real impact of proposed fixes.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "Alan Napieralski",
     "email": "alan.napieralski03@gmail.com"
