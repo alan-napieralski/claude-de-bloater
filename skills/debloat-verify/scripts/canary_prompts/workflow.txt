@@ -1,0 +1,1 @@
+List the project's available lint or test commands, then explain in one sentence what the first one does. Do not run any commands, just read the relevant files.
