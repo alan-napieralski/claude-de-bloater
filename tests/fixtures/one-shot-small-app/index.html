@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tip Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="calculator">
+    <h1>Tip Calculator</h1>
+    <label for="bill">Bill amount</label>
+    <input id="bill" type="number" min="0" step="0.01" />
+
+    <label for="tip">Tip percentage</label>
+    <input id="tip" type="number" min="0" step="1" value="15" />
+
+    <p class="result">Tip: <span id="tip-amount">$0.00</span></p>
+    <p class="result">Total: <span id="total-amount">$0.00</span></p>
+  </main>
+
+  <script>
+    const billInput = document.getElementById("bill");
+    const tipInput = document.getElementById("tip");
+    const tipAmountEl = document.getElementById("tip-amount");
+    const totalAmountEl = document.getElementById("total-amount");
+
+    function recalculate() {
+      const bill = parseFloat(billInput.value) || 0;
+      const tipPercent = parseFloat(tipInput.value) || 0;
+      const tipAmount = bill * (tipPercent / 100);
+      const total = bill + tipAmount;
+
+      tipAmountEl.textContent = `$${tipAmount.toFixed(2)}`;
+      totalAmountEl.textContent = `$${total.toFixed(2)}`;
+    }
+
+    billInput.addEventListener("input", recalculate);
+    tipInput.addEventListener("input", recalculate);
+  </script>
+</body>
+</html>

@@ -47,9 +47,17 @@ claude --plugin-dir /path/to/claude-de-bloater
 
 If you're testing the plugin against a fixture or project that sits inside this repo's own directory tree, also pass `--add-dir /path/to/claude-de-bloater`, otherwise the skills can't read their own bundled reference files (confirmed directly: Claude Code's file-access sandbox for a `--plugin-dir`-loaded plugin defaults to just the working directory, not the plugin's own install path).
 
-## Fixtures
+## Tests
 
-`fixtures/bloated-sample/` is a small project seeded with seven deliberate, independent bloat patterns, with a ground-truth answer key at `fixtures/bloated-sample/EXPECTED_FINDINGS.md`.
+`tests/fixtures/` holds small, purpose-built projects for validating the plugin itself, not real client work:
+
+- **`bloated-sample`**: seven independent bloat patterns, ground truth in `EXPECTED_FINDINGS.md`.
+- **`severe-bloat`**: the worst case, every pattern from `bloated-sample` intensified, plus a circular `@`-import (not present in `bloated-sample`). Ground truth in `EXPECTED_FINDINGS.md`.
+- **`lean-baseline`**: the best case, a small, already-disciplined project with nothing to flag. Exists to catch false positives, if a skill invents a problem here, that is a bug.
+- **`one-shot-small-app`**: a genuinely tiny, complete app (a single-page tip calculator), used to give the one-shot/brief canary prompts something realistic to measure against.
+- **`multi-workflow-app`**: a small static blog with a skill, an agent, and a command chained across a real three-step workflow (draft, review, publish), used to give the workflow canary prompt something realistic and multi-step to act on.
+
+None of the fixtures need to be git repos themselves, `debloat-verify` exercises its plain-directory-copy path against them; its git-worktree path is exercised against real external projects instead (see `references/isolation.md`).
 
 ## Research and background
 

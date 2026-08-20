@@ -1,0 +1,9 @@
+{
+  "name": "weather-cli",
+  "version": "1.0.0",
+  "description": "A small command-line tool that fetches and formats weather data for a given city.",
+  "main": "src/cli.js",
+  "scripts": {
+    "test": "node --test test/"
+  }
+}
