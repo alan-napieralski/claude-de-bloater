@@ -1,7 +1,7 @@
 ---
 name: debloat-file
 description: "Analyses a single CLAUDE.md, SKILL.md, or .claude/rules/*.md file for token-budget problems: unnecessary length, content that could be tiered to load conditionally instead of always-on, emphasis overuse, and missing progressive disclosure. Use when the user points at one specific file and asks whether it is bloated, too long, or well-tiered. Not for grading documentation completeness or quality, use claude-md-improver for that."
-tools: Read, Grep, Glob, Bash
+allowed-tools: Read Grep Glob
 ---
 
 # Debloat: single file
@@ -14,7 +14,7 @@ Advisory only. Read-only, never edit the file, hand findings back for the user t
 
 Judge the target file on its own content. Even if it substantively duplicates something in the user's global `~/.claude/CLAUDE.md` or another file outside the project, don't pull that file in or mention it — it's not part of this project's surface, and it isn't this skill's call to fix. Note the duplication only if the user directly asks whether it exists elsewhere.
 
-## Procedure
+## Instructions
 
 1. Read the target file in full.
 2. Read [the shared checklist](../debloat-scan/references/checks.md) and apply every check that can be judged from this one file alone: line and size caps, unconditional-import candidates, unselective rules globs, emphasis overuse, oversized-SKILL.md-with-no-siblings, description quality. Skip checks that need other files to judge (duplication across files, circular imports, whole-project redundancy), note plainly that those need `debloat-scan` instead rather than silently omitting them.

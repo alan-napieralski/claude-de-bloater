@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+
+# Testing
+coverage/
+*.log
+
+# Test fixtures are deliberately bloated
+tests/fixtures/

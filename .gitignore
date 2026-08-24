@@ -30,3 +30,6 @@ node_modules/
 # Claude/agent local artifacts (not the fixtures' own .claude/ directories, those are deliberate
 # seeded content and must stay tracked)
 .claude/settings.local.json
+
+# Lint cache
+.claudelint-cache/

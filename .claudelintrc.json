@@ -1,0 +1,7 @@
+{
+  "extends": "claudelint:recommended",
+  "rules": {
+    "skill-description-missing-trigger": "warn",
+    "skill-frontmatter-unknown-keys": "warn"
+  }
+}
