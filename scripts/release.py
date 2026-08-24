@@ -44,8 +44,20 @@ def main():
         sys.exit(f"error: on branch '{branch}', releases are cut from main")
 
     run("git", "fetch", "--quiet", "origin", "main", "--tags")
-    if run("git", "rev-parse", "HEAD", capture=True) != run("git", "rev-parse", "origin/main", capture=True):
-        sys.exit("error: local main and origin/main have diverged, sync first")
+    local = run("git", "rev-parse", "HEAD", capture=True)
+    remote = run("git", "rev-parse", "origin/main", capture=True)
+    if local != remote:
+        local_ahead = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", "origin/main", "HEAD"], cwd=REPO_ROOT
+        ).returncode == 0
+        remote_ahead = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", "HEAD", "origin/main"], cwd=REPO_ROOT
+        ).returncode == 0
+        if local_ahead:
+            sys.exit("error: local main is ahead of origin/main, push first: git push origin main")
+        if remote_ahead:
+            sys.exit("error: origin/main is ahead of local main, pull first: git pull origin main")
+        sys.exit("error: local main and origin/main have diverged, rebase or merge, then push")
 
     manifest_data = json.loads(MANIFEST.read_text())
     current = manifest_data["version"]
