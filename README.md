@@ -4,6 +4,26 @@ A Claude Code plugin that analyses a project's Claude Code context surface (CLAU
 
 It answers a different question to Anthropic's own `claude-md-management` plugin: that one grades whether your CLAUDE.md is good *documentation* (complete, current, actionable). This one asks whether your setup is a good *token budget*: what's always loaded that could instead load on demand, and what's duplicated across files.
 
+## Installing
+
+```bash
+claude plugin marketplace add alan-napieralski/claude-de-bloater
+claude plugin install claude-de-bloater@claude-de-bloater
+```
+
+Restart Claude Code, then `debloat-scan` and `debloat-file` are available. No auth, no other setup, both skills read files directly and estimate token cost from word count.
+
+## Updating
+
+Installing doesn't track new releases automatically, a version already on your machine stays exactly as it was until you pull the update yourself:
+
+```bash
+claude plugin marketplace update claude-de-bloater
+claude plugin update claude-de-bloater@claude-de-bloater
+```
+
+Restart Claude Code again for it to take effect.
+
 ## Why this exists
 
 Every serious tool in this space converges on the same idea: split what's always loaded from what loads on demand, and treat that split as a budget to manage, not an afterthought. What sets this plugin apart from just "shortening your CLAUDE.md" is where it looks first:
