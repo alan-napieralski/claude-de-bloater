@@ -1,0 +1,12 @@
+{
+  "name": "claude-de-bloater",
+  "private": true,
+  "description": "Dev tooling only. The plugin itself is pure markdown and has no runtime dependencies.",
+  "license": "MIT",
+  "scripts": {
+    "lint": "claudelint --no-cache"
+  },
+  "devDependencies": {
+    "claude-code-lint": "0.8.0"
+  }
+}

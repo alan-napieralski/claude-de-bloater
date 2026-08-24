@@ -1,4 +1,4 @@
-name: Release
+name: CI
 
 on:
   push:
@@ -7,15 +7,47 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  release:
+  lint:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install pinned dev tooling
+        run: npm ci --ignore-scripts
+
+      - name: Lint Claude Code configuration
+        run: npx claudelint --no-cache --format github
+
+      - name: Report findings
+        if: always()
+        run: |
+          {
+            echo "### claudelint"
+            echo
+            echo '```'
+            npx claudelint --no-cache --format compact --no-color || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  release:
+    needs: lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7

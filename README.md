@@ -86,6 +86,17 @@ claude --plugin-dir /path/to/claude-de-bloater
 
 If you're testing the plugin against a fixture or project that sits inside this repo's own directory tree, also pass `--add-dir /path/to/claude-de-bloater`, otherwise the skills can't read their own bundled reference files (confirmed directly: Claude Code's file-access sandbox for a `--plugin-dir`-loaded plugin defaults to just the working directory, not the plugin's own install path).
 
+## Linting
+
+This repo lints its own Claude Code configuration with [claudelint](https://claudelint.com/) (the `claude-code-lint` npm package, also in the landscape table below). Practising what the plugin preaches: the skills that audit other people's context surface should not have a sloppy one themselves.
+
+```bash
+npm ci --ignore-scripts   # first time only
+make lint                 # or: npx claudelint --no-cache
+```
+
+Config lives in `.claudelintrc.json` (extends `claudelint:recommended`) and `.claudelintignore`, which excludes `tests/fixtures/` because those projects are deliberately bloated and are supposed to fail every check.
+
 ## Releasing
 
 `.claude-plugin/plugin.json`'s `version` is the single source of truth, and the only thing you edit by hand. Bump it, push to `main`, and CI does the rest: it validates the manifests, creates the tag, and publishes the release.
@@ -108,9 +119,9 @@ python3 scripts/release.py major
 python3 scripts/release.py 1.2.3
 ```
 
-The script itself (`scripts/release.py`, `patch`/`minor`/`major`/an explicit `X.Y.Z`, defaults to `patch`) is plain Python, not bash, specifically so it runs identically on Windows, macOS, and Linux with no shell dependency. The `Makefile` is only a thin convenience wrapper around it, short, memorable names, for the same reason `npm run` exists, without pulling in npm itself for a single script, and it's optional: calling the script directly works exactly the same everywhere, including on macOS/Linux. Either way, it refuses to run on a dirty tree, off `main`, or out of sync with `origin/main`, then bumps the version, validates, commits `Release v<version>`, and pushes.
+The script itself (`scripts/release.py`, `patch`/`minor`/`major`/an explicit `X.Y.Z`, defaults to `patch`) is plain Python, not bash, specifically so it runs identically on Windows, macOS, and Linux with no shell dependency. The `Makefile` is only a thin convenience wrapper around it, short, memorable names, and it's optional: calling the script directly works exactly the same everywhere, including on macOS/Linux. Releasing deliberately needs no `npm install` (the `package.json` exists only to pin the linter). Either way, it refuses to run on a dirty tree, off `main`, or out of sync with `origin/main`, then bumps the version, validates, commits `Release v<version>`, and pushes.
 
-Tags follow the CLI's own `{name}--v{version}` format, created in CI by `claude plugin tag --push`, so the tag and `plugin.json` can't disagree: the command validates them against each other (and against the marketplace entry) and refuses to tag if they don't match. There is no separate `v*` tag to keep in step. A push to `main` that doesn't change the version is a no-op release-wise, it still validates, then reports that the tag already exists and stops. The workflow also runs on pull requests, validation only, so a broken manifest fails before it reaches `main`.
+Tags follow the CLI's own `{name}--v{version}` format, created in CI by `claude plugin tag --push`, so the tag and `plugin.json` can't disagree: the command validates them against each other (and against the marketplace entry) and refuses to tag if they don't match. There is no separate `v*` tag to keep in step. A push to `main` that doesn't change the version is a no-op release-wise, it still validates, then reports that the tag already exists and stops. The workflow (`.github/workflows/ci.yml`) also runs on pull requests, validation only, so a broken manifest fails before it reaches `main`. It runs `claudelint` as a separate `lint` job that the release job depends on, so nothing gets tagged off a commit with lint errors, though warnings alone won't stop a release.
 
 ## Tests
 
