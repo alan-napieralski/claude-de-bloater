@@ -66,6 +66,18 @@ claude --plugin-dir /path/to/claude-de-bloater
 
 If you're testing the plugin against a fixture or project that sits inside this repo's own directory tree, also pass `--add-dir /path/to/claude-de-bloater`, otherwise the skills can't read their own bundled reference files (confirmed directly: Claude Code's file-access sandbox for a `--plugin-dir`-loaded plugin defaults to just the working directory, not the plugin's own install path).
 
+## Releasing
+
+`.claude-plugin/plugin.json`'s `version` is the single source of truth, and the only thing you edit by hand. Bump it, push to `main`, and CI does the rest: it validates the manifests, creates the tag, and publishes the release.
+
+```bash
+./scripts/release.sh patch
+```
+
+`patch`, `minor`, `major`, or an explicit `X.Y.Z` (defaults to `patch`). The script refuses to run on a dirty tree, off `main`, or out of sync with `origin/main`, then bumps the version, validates, commits `Release v<version>`, and pushes. If you'd rather do it by hand, editing the version and pushing that commit is exactly equivalent.
+
+Tags follow the CLI's own `{name}--v{version}` format, created in CI by `claude plugin tag --push`, so the tag and `plugin.json` can't disagree: the command validates them against each other (and against the marketplace entry) and refuses to tag if they don't match. There is no separate `v*` tag to keep in step. A push to `main` that doesn't change the version is a no-op release-wise, it still validates, then reports that the tag already exists and stops. The workflow also runs on pull requests, validation only, so a broken manifest fails before it reaches `main`.
+
 ## Tests
 
 `tests/fixtures/` holds small, purpose-built projects for validating the plugin itself, not real client work:

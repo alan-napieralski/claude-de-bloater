@@ -2,18 +2,25 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  validate-and-release:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -26,16 +33,32 @@ jobs:
       - name: Validate plugin manifests
         run: claude plugin validate . --strict
 
-      - name: Check tag matches plugin.json version
+      - name: Resolve release tag
+        id: plan
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          PLUGIN_VERSION="$(jq -r .version .claude-plugin/plugin.json)"
-          if [ "$TAG_VERSION" != "$PLUGIN_VERSION" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME (version $TAG_VERSION) does not match .claude-plugin/plugin.json version $PLUGIN_VERSION. Bump plugin.json before tagging."
-            exit 1
+          NAME="$(jq -r .name .claude-plugin/plugin.json)"
+          VERSION="$(jq -r .version .claude-plugin/plugin.json)"
+          TAG="${NAME}--v${VERSION}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/$TAG" > /dev/null; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::$TAG already exists, nothing to release. Bump the version in .claude-plugin/plugin.json to cut a new one."
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Create release tag
+        if: github.event_name != 'pull_request' && steps.plan.outputs.release == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          claude plugin tag . --push --message "Release %s"
+
       - name: Create GitHub release
+        if: github.event_name != 'pull_request' && steps.plan.outputs.release == 'true'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.plan.outputs.tag }}
+          name: v${{ steps.plan.outputs.version }}
           generate_release_notes: true
