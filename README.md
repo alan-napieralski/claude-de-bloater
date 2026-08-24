@@ -90,11 +90,25 @@ If you're testing the plugin against a fixture or project that sits inside this 
 
 `.claude-plugin/plugin.json`'s `version` is the single source of truth, and the only thing you edit by hand. Bump it, push to `main`, and CI does the rest: it validates the manifests, creates the tag, and publishes the release.
 
+**macOS / Linux**, via the `Makefile` (ships with both already, nothing to install):
+
 ```bash
-./scripts/release.sh patch
+make release              # patch bump, the default
+make release-minor
+make release-major
+make release VERSION=1.2.3
 ```
 
-`patch`, `minor`, `major`, or an explicit `X.Y.Z` (defaults to `patch`). The script refuses to run on a dirty tree, off `main`, or out of sync with `origin/main`, then bumps the version, validates, commits `Release v<version>`, and pushes. If you'd rather do it by hand, editing the version and pushing that commit is exactly equivalent.
+**Windows**, call the script directly (`make` isn't native there, and this repo doesn't require installing it just for this):
+
+```bash
+python3 scripts/release.py patch
+python3 scripts/release.py minor
+python3 scripts/release.py major
+python3 scripts/release.py 1.2.3
+```
+
+The script itself (`scripts/release.py`, `patch`/`minor`/`major`/an explicit `X.Y.Z`, defaults to `patch`) is plain Python, not bash, specifically so it runs identically on Windows, macOS, and Linux with no shell dependency. The `Makefile` is only a thin convenience wrapper around it, short, memorable names, for the same reason `npm run` exists, without pulling in npm itself for a single script, and it's optional: calling the script directly works exactly the same everywhere, including on macOS/Linux. Either way, it refuses to run on a dirty tree, off `main`, or out of sync with `origin/main`, then bumps the version, validates, commits `Release v<version>`, and pushes.
 
 Tags follow the CLI's own `{name}--v{version}` format, created in CI by `claude plugin tag --push`, so the tag and `plugin.json` can't disagree: the command validates them against each other (and against the marketplace entry) and refuses to tag if they don't match. There is no separate `v*` tag to keep in step. A push to `main` that doesn't change the version is a no-op release-wise, it still validates, then reports that the tag already exists and stops. The workflow also runs on pull requests, validation only, so a broken manifest fails before it reaches `main`.
 
