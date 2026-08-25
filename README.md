@@ -115,29 +115,16 @@ Config lives in `.claudelintrc.json` (extends `claudelint:recommended`) and `.cl
 
 ## Releasing
 
-`.claude-plugin/plugin.json`'s `version` is the single source of truth, and the only thing you edit by hand. Bump it, push to `main`, and CI does the rest: it validates the manifests, creates the tag, and publishes the release.
+Releases are automated by [release-please](https://github.com/googleapis/release-please), driven entirely by [Conventional Commits](https://www.conventionalcommits.org/) on `main`. There is no version to bump and no script to run.
 
-**macOS / Linux**, via the `Makefile` (ships with both already, nothing to install):
+Every `feat:`/`fix:`/breaking-change commit merged to `main` gets folded into a standing "chore(main): release X.Y.Z" pull request, kept up to date by CI as more commits land. That PR's diff is exactly `CHANGELOG.md` plus the version bump, so it doubles as a preview, edit the changelog entries in the PR if they need wording fixes before it ships. Merging it is what cuts the release: CI then creates the `claude-de-bloater--vX.Y.Z` tag and the GitHub release, and no separate PR update is needed to react to that merge.
 
-```bash
-make release              # patch bump, the default
-make release-minor
-make release-major
-make release VERSION=1.2.3
-```
+The version itself lives in `version.txt` and is mirrored into `.claude-plugin/plugin.json`'s `version` field by release-please's `extra-files` config (`release-please-config.json`); `.release-please-manifest.json` is release-please's own bookkeeping of the last-released version. None of the three are hand-edited.
 
-**Windows**, call the script directly (`make` isn't native there, and this repo doesn't require installing it just for this):
+Commit messages therefore drive both the version bump and the changelog.
+See [CLAUDE.md](CLAUDE.md) for the full commit convention this repo follows.
 
-```bash
-python3 scripts/release.py patch
-python3 scripts/release.py minor
-python3 scripts/release.py major
-python3 scripts/release.py 1.2.3
-```
-
-The script itself (`scripts/release.py`, `patch`/`minor`/`major`/an explicit `X.Y.Z`, defaults to `patch`) is plain Python, not bash, specifically so it runs identically on Windows, macOS, and Linux with no shell dependency. The `Makefile` is only a thin convenience wrapper around it, short, memorable names, and it's optional: calling the script directly works exactly the same everywhere, including on macOS/Linux. Releasing deliberately needs no `npm install` (the `package.json` exists only to pin the linter). Either way, it refuses to run on a dirty tree, off `main`, or out of sync with `origin/main`, then bumps the version, validates, commits `Release v<version>`, and pushes.
-
-Tags follow the CLI's own `{name}--v{version}` format, created in CI by `claude plugin tag --push`, so the tag and `plugin.json` can't disagree: the command validates them against each other (and against the marketplace entry) and refuses to tag if they don't match. There is no separate `v*` tag to keep in step. A push to `main` that doesn't change the version is a no-op release-wise, it still validates, then reports that the tag already exists and stops. The workflow (`.github/workflows/ci.yml`) also runs on pull requests, validation only, so a broken manifest fails before it reaches `main`. It runs `claudelint` as a separate `lint` job that the release job depends on, so nothing gets tagged off a commit with lint errors, though warnings alone won't stop a release.
+The workflow (`.github/workflows/ci.yml`) runs `claudelint` and `claude plugin validate . --strict` as separate `lint`/`validate` jobs on every push and pull request; the `release` job depends on both and only runs on pushes to `main`, so nothing gets released off a commit that fails either check.
 
 ## Tests
 

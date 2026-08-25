@@ -1,13 +1,4 @@
-.PHONY: release release-minor release-major validate lint
-
-release:
-	python3 scripts/release.py $(or $(VERSION),patch)
-
-release-minor:
-	python3 scripts/release.py minor
-
-release-major:
-	python3 scripts/release.py major
+.PHONY: validate lint
 
 validate:
 	claude plugin validate . --strict
