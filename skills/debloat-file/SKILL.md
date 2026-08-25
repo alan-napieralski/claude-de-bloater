@@ -10,6 +10,6 @@ Reviews one file's token budget. For a whole project's surface (CLAUDE.md plus i
 
 ## Instructions
 
-1. Read [the shared checklist](../../references/checks.md). It governs every step below: the scope boundary, the read-only constraint, every check, the token estimate, and the reporting format.
+1. Read [the checks](../../references/checks.md) and [the report format](../../references/report-format.md). Between them they govern every step below: the scope boundary, the read-only constraint, every check and its severity, the token estimate, and the output shape.
 2. Read the target file in full.
-3. **Apply every check that can be judged from this one file alone**: line and size caps, unconditional-import candidates, unselective rules globs, emphasis overuse, oversized-SKILL.md-with-no-siblings, description quality. Skip checks that need other files to judge (duplication across files, circular imports, whole-project redundancy), note plainly that those need `debloat-scan` instead rather than silently omitting them.
+3. **Apply every check not marked "needs the whole surface"**, that mark is the only thing that decides applicability here. For the ones it skips, note plainly that they need `debloat-scan` instead, rather than silently omitting them.

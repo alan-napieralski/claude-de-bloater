@@ -2,6 +2,9 @@
 
 One deliberate pattern, isolated: a custom agent that cites another file as its authoritative spec
 and then restates that file's content anyway, in paraphrased wording with no identical sentences.
+Expected severity for it is **Issues**, under the rubric in
+[`references/checks.md`](../../../references/checks.md), which owns the bands, the report shape,
+and the closing call to action. Report structure is not restated here.
 Seeded after a real project (a Numiko prototype starter) reviewed clean on a first `debloat-scan`
 pass and turned out to have exactly this pattern between a review agent and its checklist, missed
 because nothing string-matched.
@@ -30,6 +33,10 @@ its own instruction to read it in full, *and* carries a paraphrased copy of most
 content permanently in its own prompt. Worse than an agent plainly duplicating `CLAUDE.md`, since
 here both copies are paid for on every single run rather than the citation replacing one of them.
 
+This is why the band is Issues rather than Warnings, despite an agent plainly restating `CLAUDE.md`
+sitting in Warnings elsewhere. Ordinary agent duplication trades one copy for another; this shape
+pays for both on every invocation, so the waste is unambiguous rather than a judgment call.
+
 `debloat-file` cannot catch this on its own: judging `publish-reviewer.md` alone might flag "this
 reads like it's restating something," but confirming the duplication needs
 `docs/publish-checklist.md` open side by side, which needs `debloat-scan`.
@@ -37,3 +44,20 @@ reads like it's restating something," but confirming the duplication needs
 Everything else here is intentionally clean: `CLAUDE.md` is short, has no `@`-imports, and does not
 itself restate anything from the checklist beyond naming it. `debloat-scan` should not report
 anything else in this fixture — it isolates the one pattern.
+
+## Second expected finding: `docs/` colocation
+
+`docs/publish-checklist.md` opens with "**This is the spec for the `publish-reviewer` agent.**",
+which is verbatim the tell the colocation check names: Claude-facing spec material sitting in a
+generically-named folder rather than colocated with the agent that owns it. It belongs at
+`.claude/agents/publish-reviewer/references/publish-checklist.md`.
+
+**Expected severity: Nice to have.** File organisation, no token cost of its own. This is the
+clearest instance of the pattern in the whole suite, since the file self-identifies as an agent
+spec, so a scan that misses it here is failing the easiest possible case.
+
+## Severity bands
+
+One **Issue** and one **Nice to have**, no Warnings. The report should close with the required
+call to action: the Issue named as the recommended work, and a question about whether to include
+the Nice to have item.
