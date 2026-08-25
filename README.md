@@ -78,6 +78,20 @@ A few things this layout deliberately gets right:
 
 Both are advisory and read-only. They read files directly and estimate token cost from word count, so there is no auth step and nothing to set up.
 
+## Additional useful tools to bulletproof your Claude setup
+
+This plugin does one thing: it reads a repo's Claude Code surface and reports, read-only, on what that surface costs in always-loaded tokens. It doesn't measure your live session, doesn't change any files, doesn't judge whether the content is *correct*, and doesn't grade it as documentation. The tools below cover those adjacent jobs, and they compose well with a `debloat-scan` in the middle.
+
+| Tool | What it is | The role it fills that this plugin doesn't |
+|---|---|---|
+| [`/context`](https://code.claude.com/docs/en/commands) | Built-in Claude Code command | Ground truth for the *current session*, not a static estimate. This plugin prices files by word count without launching anything; `/context` shows what actually landed in the window, as a coloured grid with a per-item breakdown (`/context all`). Use it to sanity-check a scan's numbers, and to catch cost this plugin can't see, MCP tool definitions, tool results, and conversation history. Note the auth caveat in [the research section](#how-claude-code-actually-loads-context): without a valid token its memory-file line silently reads `0`. |
+| [`/doctor`](https://code.claude.com/docs/en/commands) | Bundled Claude Code skill (alias `/checkup`) | Actually fixes things, interactively and with confirmation, where this plugin only reports. It also works a layer below the repo, on your installation: duplicate or leftover installs, `PATH` problems, unparseable settings, slow hooks, and unused skills, MCP servers, and plugins weighed against their context cost. Its newer checks do overlap this plugin directly (it deduplicates local `CLAUDE.md` files against checked-in ones, trims content Claude could derive from the code, and migrates what's left into skills and nested `CLAUDE.md` files), so treat the overlap as a second opinion with hands, and this plugin as the wider read-only audit across rules, agents, commands, skills, and hooks in one ranked report. `claude doctor` from the terminal gives read-only diagnostics without a session. |
+| [`claude-md-improver`](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management) | Skill in Anthropic's official `claude-md-management` plugin | Judges CLAUDE.md as *documentation*: is it complete, current, accurate, actionable, does it match a known-good template. That's the question this plugin explicitly doesn't answer, and the two verdicts genuinely diverge. A file can be admirably lean and still be wrong, vague, or missing the one fact that matters; it can also be complete, accurate, and far too expensive to load on every turn. Run this one for content quality, `debloat-file` for what that content costs. |
+| [`/revise-claude-md`](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management) | Command in the same plugin | Handles the *maintenance* half, folding what you just learned in a session back into CLAUDE.md so it stays current. It's the natural thing to reach for when a scan's real finding is "this file is stale", which is a rewrite, not a trim. Worth pairing with a scan afterwards, since accumulating session learnings is exactly how a lean file grows back into a bloated one. |
+| [claudelint](https://github.com/pdugan20/claudelint) ([docs](https://claudelint.com/)) | Standalone linter, npm package `claude-code-lint`, also installable as a plugin | Checks *validity*, not cost, and does it deterministically. 116 rules across CLAUDE.md, skills, settings, hooks, MCP servers, and plugins, catching the class of problem an advisory LLM audit will happily read straight past: malformed frontmatter, broken references, circular `@`-imports, schema-invalid settings. It's also the only tool here you can enforce, non-interactive exit codes, auto-fix, and SARIF export mean it belongs in CI where a skill can't go. This repo [uses it on itself](#linting). |
+
+Rough order of use: `claudelint` in CI so nothing invalid ever lands, `claude-md-improver` when you're unsure the content is any good, `debloat-scan` to price what you've got and rank what to move, then `/doctor` and `/context` to apply and verify. Nothing here needs the others to be useful on its own.
+
 ## Installing for local development
 
 ```bash
@@ -88,7 +102,7 @@ If you're testing the plugin against a fixture or project that sits inside this 
 
 ## Linting
 
-This repo lints its own Claude Code configuration with [claudelint](https://claudelint.com/) (the `claude-code-lint` npm package, also in the landscape table below). Practising what the plugin preaches: the skills that audit other people's context surface should not have a sloppy one themselves.
+This repo lints its own Claude Code configuration with [claudelint](https://claudelint.com/) (the `claude-code-lint` npm package, also in the tables above and below). Practising what the plugin preaches: the skills that audit other people's context surface should not have a sloppy one themselves.
 
 ```bash
 npm ci --ignore-scripts   # first time only
