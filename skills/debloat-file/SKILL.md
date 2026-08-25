@@ -8,18 +8,8 @@ allowed-tools: Read Grep Glob
 
 Reviews one file's token budget. For a whole project's surface (CLAUDE.md plus its imports, rules, commands, agents, hooks, skills together), use `debloat-scan` instead, this skill only sees the one file it's pointed at.
 
-Advisory only. Read-only, never edit the file, hand findings back for the user to act on.
-
-## Scope
-
-Judge the target file on its own content. Even if it substantively duplicates something in the user's global `~/.claude/CLAUDE.md` or another file outside the project, don't pull that file in or mention it — it's not part of this project's surface, and it isn't this skill's call to fix. Note the duplication only if the user directly asks whether it exists elsewhere.
-
 ## Instructions
 
-1. Read the target file in full.
-2. Read [the shared checklist](../debloat-scan/references/checks.md) and apply every check that can be judged from this one file alone: line and size caps, unconditional-import candidates, unselective rules globs, emphasis overuse, oversized-SKILL.md-with-no-siblings, description quality. Skip checks that need other files to judge (duplication across files, circular imports, whole-project redundancy), note plainly that those need `debloat-scan` instead rather than silently omitting them.
-3. Estimate the file's token cost (`words * 1.3`, rounded) and report it as an estimate.
-
-## Reporting
-
-Headline first: estimated tokens for this file, and that as a percentage of a 200k reference window. Then findings grouped as the checklist specifies, most token-impact first, each with the line, the problem in one sentence, and the concrete fix. If nothing is wrong, say so plainly rather than padding the list.
+1. Read [the shared checklist](../../references/checks.md). It governs every step below: the scope boundary, the read-only constraint, every check, the token estimate, and the reporting format.
+2. Read the target file in full.
+3. **Apply every check that can be judged from this one file alone**: line and size caps, unconditional-import candidates, unselective rules globs, emphasis overuse, oversized-SKILL.md-with-no-siblings, description quality. Skip checks that need other files to judge (duplication across files, circular imports, whole-project redundancy), note plainly that those need `debloat-scan` instead rather than silently omitting them.

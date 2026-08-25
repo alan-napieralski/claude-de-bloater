@@ -78,6 +78,8 @@ A few things this layout deliberately gets right:
 
 Both are advisory and read-only. They read files directly and estimate token cost from word count, so there is no auth step and nothing to set up.
 
+Both share one spec, `references/checks.md`, which owns the scope boundary, the token estimate, every check, and the reporting format.
+
 ## Additional useful tools to bulletproof your Claude setup
 
 This plugin does one thing: it reads a repo's Claude Code surface and reports, read-only, on what that surface costs in always-loaded tokens. It doesn't measure your live session, doesn't change any files, doesn't judge whether the content is *correct*, and doesn't grade it as documentation. The tools below cover those adjacent jobs, and they compose well with a `debloat-scan` in the middle.

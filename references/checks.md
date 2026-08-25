@@ -1,8 +1,24 @@
 # Debloat checks
 
-Shared by `debloat-scan` (whole project) and `debloat-file` (one file). Every check reports its estimated token cost using the same tokens-per-word approximation: `words * 1.3`, rounded, and states it as an estimate, not an exact count. Where the real number matters, defer to a `/context` reading instead of the estimate.
+Shared by `debloat-scan` (whole project) and `debloat-file` (one file). This file is the spec for both: scope, token estimate, checks, reporting format.
 
-Every finding must name the file and line, the problem in one line, and the concrete fix. Group findings under **Reduces the always-loaded footprint**, **Redundant or duplicated**, **Signal quality**, and **Structural**, most token-impact first. Report a headline number before the findings: total estimated always-loaded tokens across the whole surface, and that as a percentage of a 200k reference window. Do not invent a 0-100 score, the headline is the token estimate itself.
+## Scope
+
+Advisory only. Read-only, never edit anything, hand the findings back for the user to act on.
+
+Audit only what the skill was pointed at: the project directory for `debloat-scan`, the single file for `debloat-file`. Never follow an `@`-import that leads outside it.
+
+The session also loads the user's global `~/.claude/CLAUDE.md` and its imports. None of that belongs to the audit, so it must not appear in the output at all: not in the headline, not as a finding, not as a caveat or aside. Where the audited file duplicates global config, judge it on its own merits and say nothing about the global side, that decision is not this audit's to fix and raising it miscasts a global-config choice as a project bloat problem. Surface global config only if the user directly asks.
+
+## Token estimate
+
+Every check reports its estimated token cost using the same tokens-per-word approximation: `words * 1.3`, rounded, and states it as an estimate, not an exact count. Where the real number matters, defer to a `/context` reading instead of the estimate.
+
+## Reporting
+
+Report a headline number before the findings: the estimated always-loaded tokens for whatever was audited, the whole surface for `debloat-scan` or the single file for `debloat-file`, and that as a percentage of a 200k reference window. Do not invent a 0-100 score, the headline is the token estimate itself.
+
+Every finding must name the file and line, the problem in one line, and the concrete fix. Group findings under **Reduces the always-loaded footprint**, **Redundant or duplicated**, **Signal quality**, and **Structural**, most token-impact first. If what was audited is already lean, say so plainly rather than padding the list, three findings that matter beat twenty that don't.
 
 ## Reduces the always-loaded footprint
 
