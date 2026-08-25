@@ -10,6 +10,6 @@ Reviews one file's token budget. For a whole project's surface (CLAUDE.md plus i
 
 ## Instructions
 
-1. Read [the checks](../../references/checks.md) and [the report format](../../references/report-format.md). Between them they govern every step below: the scope boundary, the read-only constraint, every check and its severity, the token estimate, and the output shape.
+1. Read [the checks](../../references/checks.md) and [the reporting spec](../../references/reporting.md). Between them they govern the scope boundary, the read-only constraint, the token estimate, every check with its severity default, and the output.
 2. Read the target file in full.
 3. **Apply every check not marked "needs the whole surface"**, that mark is the only thing that decides applicability here. For the ones it skips, note plainly that they need `debloat-scan` instead, rather than silently omitting them.

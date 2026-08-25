@@ -78,7 +78,7 @@ A few things this layout deliberately gets right:
 
 Both are advisory and read-only. They read files directly and estimate token cost from word count, so there is no auth step and nothing to set up.
 
-Both share two specs: `references/checks.md`, which owns the scope boundary, the token estimate, and every check with its severity; and `references/report-format.md`, which owns the output shape.
+Both share two specs: `references/checks.md`, which owns the scope boundary, the token estimate, and every check with its severity default; and `references/reporting.md`, which owns the output.
 
 ## Additional useful tools to bulletproof your Claude setup
 

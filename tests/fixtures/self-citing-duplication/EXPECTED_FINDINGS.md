@@ -3,8 +3,9 @@
 One deliberate pattern, isolated: a custom agent that cites another file as its authoritative spec
 and then restates that file's content anyway, in paraphrased wording with no identical sentences.
 Expected severity for it is **Issues**, under the rubric in
-[`references/checks.md`](../../../references/checks.md), which owns the bands, the report shape,
-and the closing call to action. Report structure is not restated here.
+[`references/checks.md`](../../../references/checks.md), which owns each check's severity default.
+What is pinned down here is detection and banding, not presentation: how the report is laid out is
+the skill's own call and is not a pass/fail criterion.
 Seeded after a real project (a Numiko prototype starter) reviewed clean on a first `debloat-scan`
 pass and turned out to have exactly this pattern between a review agent and its checklist, missed
 because nothing string-matched.

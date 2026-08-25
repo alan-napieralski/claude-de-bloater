@@ -2,7 +2,7 @@
 
 Ground truth for the seven deliberate patterns seeded in this fixture. Each maps to a mechanism confirmed during research. `debloat-scan` should catch all seven; `debloat-file` should catch the ones judgeable from a single file (marked below).
 
-Each finding also carries its **expected severity** under the rubric in [`references/checks.md`](../../../references/checks.md), which owns the bands, the report shape, and the closing call to action. Report structure is not restated here, only the per-finding calls this fixture is meant to pin down.
+Each finding also carries its **expected severity** under the rubric in [`references/checks.md`](../../../references/checks.md), which owns each check's severity default. What is pinned down here is detection and banding, not presentation. A scan passes or fails on whether it finds these patterns and places them in the right band, whatever shape it chooses for the report itself, so treat wording, ordering, and layout differences as noise rather than as failures.
 
 ## 1. Unconditional `@`-import that should be path-scoped
 
