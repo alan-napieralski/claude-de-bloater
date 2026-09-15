@@ -13,6 +13,12 @@ claude plugin install claude-de-bloater@claude-de-bloater
 
 Restart Claude Code, then `debloat-scan` and `debloat-file` are available. No auth, no other setup, both skills read files directly and estimate token cost from word count.
 
+`debloat-scan` audits the whole project by default. Pass a directory to scope it instead, for example a single skill folder:
+
+```
+/claude-de-bloater:debloat-scan .claude/skills/my-skill
+```
+
 ## Updating
 
 Installing doesn't track new releases automatically, a version already on your machine stays exactly as it was until you pull the update yourself:

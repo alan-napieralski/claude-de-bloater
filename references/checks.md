@@ -8,7 +8,7 @@ Run every check below. Each carries a severity default and the reasoning behind 
 
 Advisory only. Read-only, never edit anything, hand the findings back for the user to act on.
 
-Audit only what the skill was pointed at: the project directory for `debloat-scan`, the single file for `debloat-file`. Never follow an `@`-import that leads outside it.
+Audit only what the skill was pointed at: the project directory, or a narrower directory given as an argument, for `debloat-scan`; the single file for `debloat-file`. Never follow an `@`-import that leads outside it.
 
 The session also loads the user's global `~/.claude/CLAUDE.md` and its imports. None of that belongs to the audit, so it must not appear in the output at all: not in the headline, not as a finding, not as a caveat or aside. Where the audited file duplicates global config, judge it on its own merits and say nothing about the global side, that decision is not this audit's to fix and raising it miscasts a global-config choice as a project bloat problem. Surface global config only if the user directly asks.
 
